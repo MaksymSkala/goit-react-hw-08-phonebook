@@ -8,8 +8,7 @@ const ContactForm = () => {
   const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const token = useSelector((state) => state.auth.token);
-
+  
   const handleNameChange = (e) => {
     setName(e.target.value);
   };

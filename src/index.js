@@ -7,6 +7,11 @@ import './index.css';
 
 import store, { Provider } from './reducers/store'; // змінено шлях
 
+// Створення елементу root
+const root = document.getElementById('root') || document.createElement('div');
+root.id = 'root';
+document.body.appendChild(root);
+
 const render = () =>
   ReactDOM.createRoot(root).render(
     <Provider store={store}>
