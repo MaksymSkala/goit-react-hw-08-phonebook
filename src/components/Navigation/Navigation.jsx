@@ -1,22 +1,23 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Box, Flex, Link, Button, Spacer } from '@chakra-ui/react';
+import { Box, Flex, Link, Spacer } from '@chakra-ui/react';
 import { useSelector } from 'react-redux';
-import UserMenu from '../UserMenu/UserMenu'; // Імпорт компоненту UserMenu
+import UserMenu from '../UserMenu/UserMenu';
 
 const Navigation = () => {
-  const isAuthenticated = useSelector((state) => state.auth.token !== null); // Перевірка, чи користувач увійшов у систему
+  const isAuthenticated = useSelector((state) => state.auth.token !== null);
 
   return (
     <Flex p={4} bg="blue.500" color="white">
       <Box>
-        <Link as={RouterLink} to="/" mr={4}>
-          Home
-        </Link>
-        <Link as={RouterLink} to="/contacts" mr={4}>
+        <Link
+          as={RouterLink}
+          to={isAuthenticated ? '/contacts' : '/login'}
+          mr={4}
+        >
           Contacts
         </Link>
-        {isAuthenticated ? null : ( // Відображення тільки для неавторизованих користувачів
+        {isAuthenticated ? null : (
           <>
             <Link as={RouterLink} to="/register" mr={4}>
               Register
@@ -29,7 +30,7 @@ const Navigation = () => {
       </Box>
       <Spacer />
       <Box>
-        {isAuthenticated && <UserMenu />} {/* Відображення UserMenu тільки для авторизованих користувачів */}
+        {isAuthenticated && <UserMenu />}
       </Box>
     </Flex>
   );

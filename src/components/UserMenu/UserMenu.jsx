@@ -12,7 +12,8 @@ const UserMenu = ({ email }) => {
     // Виклик функції для виходу
     await dispatch(logoutUser());
 
-    // Перенаправлення на головну сторінку
+    // Видалення токену з localStorage та перенаправлення на головну сторінку
+    localStorage.removeItem('token');
     navigate('/');
   };
 
