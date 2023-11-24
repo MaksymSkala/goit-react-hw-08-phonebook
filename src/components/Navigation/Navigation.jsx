@@ -1,8 +1,12 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Flex, Link, Button, Spacer } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
+import UserMenu from '../UserMenu/UserMenu'; // Імпорт компоненту UserMenu
 
 const Navigation = () => {
+  const isAuthenticated = useSelector((state) => state.auth.token !== null); // Перевірка, чи користувач увійшов у систему
+
   return (
     <Flex p={4} bg="blue.500" color="white">
       <Box>
@@ -12,21 +16,20 @@ const Navigation = () => {
         <Link as={RouterLink} to="/contacts" mr={4}>
           Contacts
         </Link>
-        {/* Додай інші посилання на інші сторінки, наприклад, /register та /login */}
-        <Link as={RouterLink} to="/register" mr={4}>
-          Register
-        </Link>
-        <Link as={RouterLink} to="/login" mr={4}>
-          Login
-        </Link>
+        {isAuthenticated ? null : ( // Відображення тільки для неавторизованих користувачів
+          <>
+            <Link as={RouterLink} to="/register" mr={4}>
+              Register
+            </Link>
+            <Link as={RouterLink} to="/login" mr={4}>
+              Login
+            </Link>
+          </>
+        )}
       </Box>
       <Spacer />
       <Box>
-        {/* Додай компонент UserMenu з поштою користувача і кнопкою виходу */}
-        {/* Наприклад: <UserMenu email="user@example.com" onLogout={handleLogout} /> */}
-        <Button colorScheme="red" mr={4}>
-          Logout
-        </Button>
+        {isAuthenticated && <UserMenu />} {/* Відображення UserMenu тільки для авторизованих користувачів */}
       </Box>
     </Flex>
   );

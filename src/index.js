@@ -1,13 +1,25 @@
 import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
+import ReactDOM from 'react-dom/client';
 import App from './components/App';
+import { ChakraProvider } from '@chakra-ui/react';
+import theme from './theme';
+import './index.css';
 
-const Root = () => {
-  return (
-    <ChakraProvider>
-      <App />
-    </ChakraProvider>
+import store, { Provider } from './reducers/store'; // змінено шлях
+
+const render = () =>
+  ReactDOM.createRoot(root).render(
+    <Provider store={store}>
+      <ChakraProvider theme={theme}>
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      </ChakraProvider>
+    </Provider>
   );
-};
 
-export default Root;
+if (process.env.NODE_ENV === 'development' && module.hot) {
+  module.hot.accept('./components/App', render);
+}
+
+render();

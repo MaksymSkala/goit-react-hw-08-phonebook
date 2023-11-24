@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../../authSlice/authSlice';
 import { Button, FormControl, FormLabel, Input, VStack } from '@chakra-ui/react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -16,11 +19,16 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Виклик функції для логіну
-    dispatch(login({ email, password }));
+    const success = await dispatch(login({ email, password }));
+
+    // Якщо логін успішний, перенаправити на сторінку контактів
+    if (success) {
+      navigate('/contacts');
+    }
   };
 
   return (
@@ -38,6 +46,7 @@ const Login = () => {
           Log In
         </Button>
       </form>
+      <Link to="/register">Don't have an account? Register here</Link>
     </VStack>
   );
 };

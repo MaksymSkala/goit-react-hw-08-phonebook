@@ -1,47 +1,82 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteContact, fetchContacts } from '../../reducers/contactsSlice';
-import { Button, List, ListItem, VStack } from '@chakra-ui/react';
+import { fetchContacts, deleteContact, addContact } from '../../reducers/contactsSlice';
+import { Button, Input, ListItem, UnorderedList, VStack, Box } from '@chakra-ui/react';
+import UserMenu from '../UserMenu/UserMenu'; // Імпортуємо компонент UserMenu
 
 const Contacts = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector((state) => state.items);
-  const isLoading = useSelector((state) => state.isLoading);
-  const error = useSelector((state) => state.error);
-  const filter = useSelector((state) => state.filter);
+  const contacts = useSelector((state) => state.contacts.items);
+  const isLoading = useSelector((state) => state.contacts.isLoading);
+  const error = useSelector((state) => state.contacts.error);
+
+  const [newContact, setNewContact] = useState({ name: '', number: '' });
 
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
 
-  const filteredContacts = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewContact((prevContact) => ({ ...prevContact, [name]: value }));
+  };
+
+  const isContactUnique = () => {
+    return !contacts.some(
+      (contact) => contact.name.toLowerCase() === newContact.name.toLowerCase() || contact.number === newContact.number
+    );
+  };
+
+  const handleAddContact = () => {
+    if (!isContactUnique()) {
+      alert('Contact with this name or number already exists.');
+      return;
+    }
+
+    dispatch(addContact(newContact));
+    setNewContact({ name: '', number: '' });
+  };
 
   const handleDeleteContact = (contactId) => {
     dispatch(deleteContact(contactId));
   };
 
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
-
   return (
-    <VStack align="flex-start">
-      <List>
-        {filteredContacts.map(({ id, name, number }) => (
-          <ListItem key={id} mb={4}>
+    <VStack spacing={4} align="stretch">
+      {/* Додайте кнопку Logout вверху справа */}
+      <Box alignSelf="flex-end" mt={2}>
+        <UserMenu />
+      </Box>
+      
+      <Input
+        type="text"
+        name="name"
+        placeholder="Name"
+        value={newContact.name}
+        onChange={handleInputChange}
+      />
+      <Input
+        type="text"
+        name="number"
+        placeholder="Phone Number"
+        value={newContact.number}
+        onChange={handleInputChange}
+      />
+      <Button colorScheme="teal" onClick={handleAddContact}>
+        Add Contact
+      </Button>
+      {isLoading && <p>Loading...</p>}
+      {error && <p>Error: {error}</p>}
+      <UnorderedList>
+        {contacts.map(({ id, name, number }) => (
+          <ListItem key={id}>
             {name}: {number}
-            <Button ml={4} colorScheme="red" size="sm" onClick={() => handleDeleteContact(id)}>
+            <Button colorScheme="red" size="xs" onClick={() => handleDeleteContact(id)}>
               Delete
             </Button>
           </ListItem>
         ))}
-      </List>
+      </UnorderedList>
     </VStack>
   );
 };
