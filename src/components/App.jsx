@@ -6,6 +6,8 @@ import Login from './Login/Login';
 import Contacts from './Contacts/Contacts';
 
 const App = () => {
+  const isAuthenticated = !!localStorage.getItem('token');
+
   return (
     <Router>
       <div>
@@ -15,14 +17,12 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route
             path="/contacts"
-            element={
-              // Логіка перенаправлення на сторінку логіну, якщо користувач не авторизований
-              localStorage.getItem('token') ? (
-                <Contacts />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isAuthenticated ? (
+              <Contacts />
+            ) : (
+              // Якщо не автентифіковано, перенаправте на сторінку логіну
+              <Navigate to="/login" />
+            )}
           />
           {/* Додайте маршрут за замовчуванням */}
           <Route path="*" element={<DefaultComponent />} />
@@ -34,7 +34,7 @@ const App = () => {
 
 // Компонент за замовчуванням, який може бути вашим компонентом 404 або іншим
 const DefaultComponent = () => {
-  return <div>Default Content</div>;
+  return <div>Phonebook</div>;
 };
 
 export default App;

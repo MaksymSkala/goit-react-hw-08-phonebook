@@ -9,13 +9,10 @@ export const register = createAsyncThunk('auth/register', async ({ name, email, 
     return response.data.user;
   } catch (error) {
     if (error.response) {
-      // Відповідь отримана, але сервер повернув помилку зі статусом
       return error.response.data;
     } else if (error.request) {
-      // Запит було відправлено, але відповідь не отримано
       throw new Error('No response received from the server');
     } else {
-      // Виникла помилка під час налаштування запиту
       throw new Error('Request configuration error');
     }
   }
@@ -24,39 +21,37 @@ export const register = createAsyncThunk('auth/register', async ({ name, email, 
 export const login = createAsyncThunk('auth/login', async ({ email, password }) => {
   try {
     const response = await axios.post('https://connections-api.herokuapp.com/users/login', { email, password });
-    return response.data;
+    saveTokenToLocalStorage(response.data.token);
+    return response.data.user;
   } catch (error) {
     if (error.response) {
-      // Відповідь отримана, але сервер повернув помилку зі статусом
       return error.response.data;
     } else if (error.request) {
-      // Запит було відправлено, але відповідь не отримано
       throw new Error('No response received from the server');
     } else {
-      // Виникла помилка під час налаштування запиту
       throw new Error('Request configuration error');
     }
   }
 });
 
 export const refreshToken = createAsyncThunk('auth/refreshToken', async () => {
-  const response = await axios.post('/api/auth/refreshToken');
-  saveTokenToLocalStorage(response.data.token);
-  return response.data.user;
-});
-
-// Асинхронний thunk для виходу з облікового запису
-export const logoutUser = createAsyncThunk('auth/logout', async () => {
   try {
-    await axios.post('https://connections-api.herokuapp.com/users/logout');
-    removeTokenFromLocalStorage(); // Впевніться, що правильно імпортуєте removeTokenFromLocalStorage
-    return true; // Якщо успішно вийшли, можна повернути якусь інформацію, якщо потрібно
+    const response = await axios.post('/api/auth/refreshToken');
+    saveTokenToLocalStorage(response.data.token);
+    return response.data.user;
   } catch (error) {
-    throw new Error('Failed to log out'); // Можна відправити якусь іншу помилку, якщо потрібно
+    throw new Error('Failed to refresh token');
   }
 });
 
-// ... інші редуктори та extraReducers
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
+  try {
+    await axios.post('https://connections-api.herokuapp.com/users/logout');
+    removeTokenFromLocalStorage();
+  } catch (error) {
+    throw new Error('Failed to log out');
+  }
+});
 
 const authSlice = createSlice({
   name: 'auth',
@@ -64,7 +59,6 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Реєстрація, Логін, Оновлення токену
       .addCase(register.pending, (state) => {
         state.isLoading = true;
       })
@@ -76,8 +70,28 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message;
       })
-      // ... інші extraReducers
-      // Вихід
+      .addCase(login.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(refreshToken.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(refreshToken.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
       .addCase(logoutUser.pending, (state) => {
         state.isLoading = true;
       })
