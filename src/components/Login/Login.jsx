@@ -21,13 +21,20 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Виклик функції для логіну
-    const success = await dispatch(login({ email, password }));
-
-    // Якщо логін успішний, перенаправити на сторінку контактів
-    if (success) {
-      navigate('/contacts');
+  
+    try {
+      // Виклик функції для логіну
+      const response = await dispatch(login({ email, password }));
+  
+      // Перенаправити на сторінку контактів, якщо логін успішний
+      if (response) {
+        navigate('/contacts');
+      } else {
+        // Видача помилки, якщо логін не вдається
+        console.error('Login failed. Invalid email or password.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error.message);
     }
   };
 
