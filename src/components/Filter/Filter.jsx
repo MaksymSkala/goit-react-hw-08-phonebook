@@ -5,7 +5,7 @@ import { Input, Button, HStack, VStack } from '@chakra-ui/react';
 
 const Filter = () => {
   const dispatch = useDispatch();
-  const filter = useSelector((state) => state.filter);
+  const filter = useSelector((state) => state.contacts.filter);
 
   const handleFilterChange = (event) => {
     dispatch(setFilter(event.target.value));
@@ -18,6 +18,7 @@ const Filter = () => {
   return (
     <VStack spacing={4} align="flex-start">
       <HStack>
+        {/* Оновлений Input для відображення поточного фільтра зі стану Redux */}
         <Input
           type="text"
           name="filter"
