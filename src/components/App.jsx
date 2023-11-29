@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './Navigation/Navigation';
 import Register from './Register/Register';
 import Login from './Login/Login';
@@ -20,11 +20,9 @@ const App = () => {
             element={isAuthenticated ? (
               <Contacts />
             ) : (
-              // Якщо не автентифіковано, перенаправте на сторінку логіну
               <Navigate to="/login" />
             )}
           />
-          {/* Додайте маршрут за замовчуванням */}
           <Route path="*" element={<DefaultComponent />} />
         </Routes>
       </div>
@@ -32,7 +30,6 @@ const App = () => {
   );
 };
 
-// Компонент за замовчуванням, який може бути вашим компонентом 404 або іншим
 const DefaultComponent = () => {
   return <div>Phonebook</div>;
 };
